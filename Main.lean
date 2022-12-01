@@ -26,7 +26,6 @@ def grade (sheetName : Name) (sheet submission : Environment) : IO (Array Exerci
   let mut results := #[]
   -- TODO check imports
   for name in sheetMod.constNames, constInfo in sheetMod.constants do
-    dbg_trace constInfo.value?
     if constInfo.value?.any (·.hasSorry) then
       let result ←
         -- exercise to be filled in
@@ -68,3 +67,5 @@ def main (args : List String) : IO Unit := do
   let exercises ← grade sheetName sheet submissionEnv
   let results : GradingResults := { errors, exercises }
   IO.println (toJson results).pretty
+  unless results.errors.isEmpty && results.exercises.all (·.passed) do
+    Process.exit 1
